@@ -17,7 +17,7 @@
 
 ## Overview
 
-The Sensu Prometheus remote write Handler is a [Sensu Handler][6] that sends metrics to time series database that has Prometheus remote write interface.
+The Sensu Prometheus remote write Handler is a [Sensu Handler][6] that sends metrics to time series database that has [Prometheus remote write][11] interface.
 
 ## Usage examples
 
@@ -100,3 +100,4 @@ For more information about contributing to this plugin, see [Contributing][1].
 [8]: https://bonsai.sensu.io/
 [9]: https://github.com/sensu/sensu-plugin-tool
 [10]: https://docs.sensu.io/sensu-go/latest/reference/assets/
+[11]: https://prometheus.io/docs/prometheus/latest/storage/#remote-storage-integrations
