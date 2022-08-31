@@ -15,9 +15,9 @@ import (
 // Config represents the handler plugin config.
 type Config struct {
 	sensu.PluginConfig
-	Endpoint string
-	Timeout string
-	Headers []string
+	Endpoint           string
+	Timeout            string
+	Headers            []string
 	IncludeEventStatus bool
 }
 
@@ -40,28 +40,28 @@ var (
 			Value:     &plugin.Endpoint,
 		},
 		&sensu.PluginConfigOption[string]{
-			Path: "timeout",
-			Argument: "timeout",
+			Path:      "timeout",
+			Argument:  "timeout",
 			Shorthand: "t",
-			Default: "10s",
-			Usage: "Remote write timeout",
-			Value: &plugin.Timeout,
+			Default:   "10s",
+			Usage:     "Remote write timeout",
+			Value:     &plugin.Timeout,
 		},
 		&sensu.SlicePluginConfigOption[string]{
-			Path: "header",
-			Argument: "header",
+			Path:      "header",
+			Argument:  "header",
 			Shorthand: "H",
-			Default: []string{},
-			Usage: "Additional header(s) to send in remote write request",
-			Value: &plugin.Headers,
+			Default:   []string{},
+			Usage:     "Additional header(s) to send in remote write request",
+			Value:     &plugin.Headers,
 		},
 		&sensu.PluginConfigOption[bool]{
-			Path: "include-event-status",
-			Argument: "include-event-status",
+			Path:      "include-event-status",
+			Argument:  "include-event-status",
 			Shorthand: "i",
-			Default: false,
-			Usage: "If true, the check status result will be captured as a metric",
-			Value: &plugin.IncludeEventStatus,
+			Default:   false,
+			Usage:     "If true, the check status result will be captured as a metric",
+			Value:     &plugin.IncludeEventStatus,
 		},
 	}
 )
@@ -96,16 +96,16 @@ func executeHandler(event *corev2.Event) error {
 	for _, point := range event.Metrics.Points {
 		var labels []promremote.Label
 		labels = append(labels, promremote.Label{
-			Name: "__name__",
+			Name:  "__name__",
 			Value: strings.Split(point.Name, ".")[0],
 		})
 		labels = append(labels, promremote.Label{
-			Name: "sensu_entity_name",
+			Name:  "sensu_entity_name",
 			Value: event.Entity.Name,
 		})
 		for _, tag := range point.Tags {
 			labels = append(labels, promremote.Label{
-				Name: tag.Name,
+				Name:  tag.Name,
 				Value: tag.Value,
 			})
 		}
@@ -117,7 +117,7 @@ func executeHandler(event *corev2.Event) error {
 			Labels: labels,
 			Datapoint: promremote.Datapoint{
 				Timestamp: timestamp,
-				Value: point.Value,
+				Value:     point.Value,
 			},
 		})
 	}
@@ -125,11 +125,11 @@ func executeHandler(event *corev2.Event) error {
 	if plugin.IncludeEventStatus && event.HasCheck() {
 		var labels []promremote.Label
 		labels = append(labels, promremote.Label{
-			Name: "entity",
+			Name:  "entity",
 			Value: event.Entity.Name,
 		})
 		labels = append(labels, promremote.Label{
-			Name: "check",
+			Name:  "check",
 			Value: event.Check.Name,
 		})
 		timestamp, err := convertInt64ToTime(event.Timestamp)
@@ -138,32 +138,38 @@ func executeHandler(event *corev2.Event) error {
 		}
 		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
 			Labels: append(labels, promremote.Label{
-				Name: "__name__",
+				Name:  "__name__",
 				Value: "sensu_event_status",
 			}),
 			Datapoint: promremote.Datapoint{
 				Timestamp: timestamp,
-				Value: float64(event.Check.Status),
+				Value:     float64(event.Check.Status),
 			},
 		})
 		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
 			Labels: append(labels, promremote.Label{
-				Name: "__name__",
+				Name:  "__name__",
 				Value: "sensu_event_occurrences",
 			}),
 			Datapoint: promremote.Datapoint{
 				Timestamp: timestamp,
-				Value: float64(event.Check.Occurrences),
+				Value:     float64(event.Check.Occurrences),
 			},
 		})
 		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
 			Labels: append(labels, promremote.Label{
-				Name: "__name__",
+				Name:  "__name__",
 				Value: "sensu_event_silenced",
 			}),
 			Datapoint: promremote.Datapoint{
 				Timestamp: timestamp,
-				Value: func() float64 { if event.IsSilenced() { return 1 } else { return 0 } }(),
+				Value: func() float64 {
+					if event.IsSilenced() {
+						return 1
+					} else {
+						return 0
+					}
+				}(),
 			},
 		})
 	}
