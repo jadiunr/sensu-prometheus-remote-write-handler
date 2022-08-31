@@ -36,10 +36,11 @@ Available Commands:
   version     Print the version number of this plugin
 
 Flags:
-  -e, --endpoint string   Remote write endpoint
-  -H, --header strings    Additional header(s) to send in remote write request
-  -h, --help              help for sensu-prometheus-remote-write-handler
-  -t, --timeout string    Remote write timeout (default "10s")
+  -e, --endpoint string        Remote write endpoint
+  -H, --header strings         Additional header(s) to send in remote write request
+  -h, --help                   help for sensu-prometheus-remote-write-handler
+  -i, --include-event-status   If true, the check status result will be captured as a metric
+  -t, --timeout string         Remote write timeout (default "10s")
 
 Use "sensu-prometheus-remote-write-handler [command] --help" for more information about a command.
 ```

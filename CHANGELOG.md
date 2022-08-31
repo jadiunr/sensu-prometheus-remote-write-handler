@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.2.0] - 2022-09-01
+
+### Added
+- Add support event status including
+
 ## [0.1.0] - 2022-07-12
 
 ### Added
