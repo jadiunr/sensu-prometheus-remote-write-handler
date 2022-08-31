@@ -18,6 +18,7 @@ type Config struct {
 	Endpoint string
 	Timeout string
 	Headers []string
+	IncludeEventStatus bool
 }
 
 var (
@@ -54,6 +55,14 @@ var (
 			Usage: "Additional header(s) to send in remote write request",
 			Value: &plugin.Headers,
 		},
+		&sensu.PluginConfigOption[bool]{
+			Path: "include-event-status",
+			Argument: "include-event-status",
+			Shorthand: "i",
+			Default: false,
+			Usage: "If true, the check status result will be captured as a metric",
+			Value: &plugin.IncludeEventStatus,
+		},
 	}
 )
 
@@ -82,9 +91,10 @@ func executeHandler(event *corev2.Event) error {
 		return err
 	}
 
-	timeSeriesList := make(promremote.TSList, 0, len(event.Metrics.Points))
+	var timeSeriesList promremote.TSList
+
 	for _, point := range event.Metrics.Points {
-		labels := make([]promremote.Label, 0, len(point.Tags) + 2)
+		var labels []promremote.Label
 		labels = append(labels, promremote.Label{
 			Name: "__name__",
 			Value: strings.Split(point.Name, ".")[0],
@@ -108,6 +118,52 @@ func executeHandler(event *corev2.Event) error {
 			Datapoint: promremote.Datapoint{
 				Timestamp: timestamp,
 				Value: point.Value,
+			},
+		})
+	}
+
+	if plugin.IncludeEventStatus && event.HasCheck() {
+		var labels []promremote.Label
+		labels = append(labels, promremote.Label{
+			Name: "entity",
+			Value: event.Entity.Name,
+		})
+		labels = append(labels, promremote.Label{
+			Name: "check",
+			Value: event.Check.Name,
+		})
+		timestamp, err := convertInt64ToTime(event.Timestamp)
+		if err != nil {
+			return err
+		}
+		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
+			Labels: append(labels, promremote.Label{
+				Name: "__name__",
+				Value: "sensu_event_status",
+			}),
+			Datapoint: promremote.Datapoint{
+				Timestamp: timestamp,
+				Value: float64(event.Check.Status),
+			},
+		})
+		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
+			Labels: append(labels, promremote.Label{
+				Name: "__name__",
+				Value: "sensu_event_occurrences",
+			}),
+			Datapoint: promremote.Datapoint{
+				Timestamp: timestamp,
+				Value: float64(event.Check.Occurrences),
+			},
+		})
+		timeSeriesList = append(timeSeriesList, promremote.TimeSeries{
+			Labels: append(labels, promremote.Label{
+				Name: "__name__",
+				Value: "sensu_event_silenced",
+			}),
+			Datapoint: promremote.Datapoint{
+				Timestamp: timestamp,
+				Value: func() float64 { if event.IsSilenced() { return 1 } else { return 0 } }(),
 			},
 		})
 	}
