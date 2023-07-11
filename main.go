@@ -125,11 +125,11 @@ func executeHandler(event *corev2.Event) error {
 	if plugin.IncludeEventStatus && event.HasCheck() {
 		var labels []promremote.Label
 		labels = append(labels, promremote.Label{
-			Name:  "entity",
+			Name:  "sensu_entity_name",
 			Value: event.Entity.Name,
 		})
 		labels = append(labels, promremote.Label{
-			Name:  "check",
+			Name:  "sensu_check_name",
 			Value: event.Check.Name,
 		})
 		timestamp, err := convertInt64ToTime(event.Timestamp)
