@@ -19,6 +19,7 @@ type Config struct {
 	Timeout            string
 	Headers            []string
 	IncludeEventStatus bool
+	IncludeCheckName   bool
 }
 
 var (
@@ -58,10 +59,18 @@ var (
 		&sensu.PluginConfigOption[bool]{
 			Path:      "include-event-status",
 			Argument:  "include-event-status",
-			Shorthand: "i",
+			Shorthand: "S",
 			Default:   false,
 			Usage:     "If true, the check status result will be captured as a metric",
 			Value:     &plugin.IncludeEventStatus,
+		},
+		&sensu.PluginConfigOption[bool]{
+			Path:      "include-check-name",
+			Argument:  "include-check-name",
+			Shorthand: "C",
+			Default:   false,
+			Usage:     "If true, the name of CheckConfig is added as a label to all metrics sent from Sensu",
+			Value:     &plugin.IncludeCheckName,
 		},
 	}
 )
@@ -103,6 +112,12 @@ func executeHandler(event *corev2.Event) error {
 			Name:  "sensu_entity_name",
 			Value: event.Entity.Name,
 		})
+		if plugin.IncludeCheckName && event.HasCheck() {
+			labels = append(labels, promremote.Label{
+				Name: "sensu_check_name",
+				Value: event.Check.Name,
+			})
+		}
 		for _, tag := range point.Tags {
 			labels = append(labels, promremote.Label{
 				Name:  tag.Name,

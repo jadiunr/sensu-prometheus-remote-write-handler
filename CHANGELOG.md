@@ -7,6 +7,19 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+- Add command line option `include-check-name`
+
+## [1.0.0] - 2023-07-12
+
+### Changed
+- Rename labels used in event status (for `sensu_event_*` metrics)
+    - `entity` => `sensu_entity_name`
+    - `check` => `sensu_check_name`
+
+### Security
+- Update dependencies in `go.mod`
+
 ## [0.2.0] - 2022-09-01
 
 ### Added
