@@ -39,7 +39,8 @@ Flags:
   -e, --endpoint string        Remote write endpoint
   -H, --header strings         Additional header(s) to send in remote write request
   -h, --help                   help for sensu-prometheus-remote-write-handler
-  -i, --include-event-status   If true, the check status result will be captured as a metric
+  -C, --include-check-name     If true, the name of CheckConfig is added as a label to all metrics sent from Sensu
+  -S, --include-event-status   If true, the check status result will be captured as a metric
   -t, --timeout string         Remote write timeout (default "10s")
 
 Use "sensu-prometheus-remote-write-handler [command] --help" for more information about a command.
@@ -57,7 +58,7 @@ following command to add the asset:
 sensuctl asset add jadiunr/sensu-prometheus-remote-write-handler
 ```
 
-If you're using an earlier version of sensuctl, you can find the asset on the [Bonsai Asset Index][https://bonsai.sensu.io/assets/jadiunr/sensu-prometheus-remote-write-handler].
+If you're using an earlier version of sensuctl, you can find the asset on the [Bonsai Asset Index](https://bonsai.sensu.io/assets/jadiunr/sensu-prometheus-remote-write-handler).
 
 ### Handler definition
 

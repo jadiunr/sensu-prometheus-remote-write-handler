@@ -7,6 +7,8 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.1.0] - 2023-07-14
+
 ### Added
 - Add command line option `include-check-name`
 
