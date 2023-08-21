@@ -104,9 +104,16 @@ func executeHandler(event *corev2.Event) error {
 
 	for _, point := range event.Metrics.Points {
 		var labels []promremote.Label
+		var metricName string
+		splittedMetricName := strings.Split(point.Name, ".")
+		if strings.Join(splittedMetricName[1:], ".") == "value" {
+			metricName = splittedMetricName[0]
+		} else {
+			metricName = strings.Join(splittedMetricName, "_")
+		}
 		labels = append(labels, promremote.Label{
 			Name:  "__name__",
-			Value: strings.Split(point.Name, ".")[0],
+			Value: metricName,
 		})
 		labels = append(labels, promremote.Label{
 			Name:  "sensu_entity_name",
